@@ -1,22 +1,27 @@
 from django.shortcuts import render,HttpResponse,redirect
 from .forms import UserForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import auth
 from .utills import send_mail
 from django.contrib.auth.models import User
 from .models import Code,MailValid
+from django.contrib import messages
 # Create your views here.
 
 @login_required(login_url="Login")
 def index(request):
-    form = UserForm(request.POST or None)
-    if form.is_valid():
-        return HttpResponse("form submitted")
-    return render(request,"base.html",{'form':form})
+    return render(request,"base.html")
 
 
 def login(request):
     if request.method == "POST":
-        pass
+        form = UserForm(request.POST)
+        username = request.POST.get("email",'')
+        password = request.POST.get("password",'')
+        user = User.objects.get(username=username,password=password)
+        auth.login(request,user)
+        messages.success(request,"User Logged In Successfully")
+        return redirect('Index')
     form = UserForm()
     return render(request,'User/Login.html',{'form':form})
 
@@ -36,13 +41,14 @@ def signup(request):
                         user.save()
                         send_mail(to_email=mail)
                         MailValid(user=user).save()
+                        messages.success(request,"Check your registered Mail for OTP")
                         return redirect('Otp',mail)
                     except:
-                        return HttpResponse('Something went wrong')
+                        messages.warning(request,"Something went Wrong please check your mail is correct")
                 else:
-                    return HttpResponse("Password do not match")
+                    messages.warning(request,"Password do not match ")
             else:
-                return HttpResponse("Email Already taken")
+                messages.warning(request,"User Already Exist")
     form = UserForm()
     return render(request,"User/Signup.html",{'form':form})
 
@@ -60,9 +66,18 @@ def verify_otp(request,mail):
                 mailvalidate = MailValid.objects.get(user=user)
                 mailvalidate.mail_valid = True
                 mailvalidate.save()
+                print('mailvalited',mailvalidate.mail_valid)
                 otp.delete()
-                return render(request,"base.html")
+                return redirect("Login")
+            else:
+                messages.warning(request,"Entered OTP is Invalid")
     return render(request,"User/otp.html")
 
 def forget_password(request):
     return render(request,'User/forgetPassword.html')
+
+
+def logout(request):
+    auth.logout(request)
+    messages.success(request,"User Logout Successfully")
+    return redirect("Login")
