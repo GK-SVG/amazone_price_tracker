@@ -39,10 +39,13 @@ def signup(request):
                         username = mail
                         user = User(username=username,email=mail,password=password)
                         user.save()
-                        send_mail(to_email=mail)
-                        MailValid(user=user).save()
-                        messages.success(request,"Check your registered Mail for OTP")
-                        return redirect('Otp',mail)
+                        valid_mail = send_mail(to_email=mail)
+                        if valid_mail:
+                            MailValid(user=user).save()
+                            messages.success(request,"Check your registered Mail for OTP")
+                            return redirect('Otp',mail)
+                        else:
+                            messages.warning(request,"Entered Mail is invalid")
                     except:
                         messages.warning(request,"Something went Wrong please check your mail is correct")
                 else:
