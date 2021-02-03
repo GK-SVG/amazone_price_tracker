@@ -18,16 +18,20 @@ def login(request):
         form = UserForm(request.POST)
         username = request.POST.get("email",'')
         password = request.POST.get("password",'')
-        user = User.objects.get(username=username,password=password)
-        auth.login(request,user)
-        messages.success(request,"User Logged In Successfully")
-        return redirect('Index')
+        try:
+            user = User.objects.get(username=username,password=password)
+            auth.login(request,user)
+            messages.success(request,"User Logged In Successfully")
+            return redirect('Index')
+        except:
+            messages.warning(request,"Invalid Username or Passwrd")
     form = UserForm()
     return render(request,'User/Login.html',{'form':form})
 
 
 def signup(request):
     if request.method=="POST":
+        print(request.POST)
         form = UserForm(request.POST)
         if form.is_valid():
             mail = form.cleaned_data['email']
@@ -39,13 +43,10 @@ def signup(request):
                         username = mail
                         user = User(username=username,email=mail,password=password)
                         user.save()
-                        valid_mail = send_mail(to_email=mail)
-                        if valid_mail:
-                            MailValid(user=user).save()
-                            messages.success(request,"Check your registered Mail for OTP")
-                            return redirect('Otp',mail)
-                        else:
-                            messages.warning(request,"Entered Mail is invalid")
+                        send_mail(to_email=mail)
+                        MailValid(user=user).save()
+                        messages.success(request,"Check your registered Mail for OTP")
+                        return redirect('Otp',mail)
                     except:
                         messages.warning(request,"Something went Wrong please check your mail is correct")
                 else:
@@ -58,27 +59,60 @@ def signup(request):
 
 def verify_otp(request,mail):
     if request.method=="POST":
-        print(request.POST)
         otp = request.POST.get('otp')
         if User.objects.filter(email=mail).exists():
             user = User.objects.get(email=mail)
             otp = Code.objects.get(user=user)
-            print('otp--',otp.code)
-            print('user--',user)
             if otp.code==str(otp):
                 mailvalidate = MailValid.objects.get(user=user)
                 mailvalidate.mail_valid = True
                 mailvalidate.save()
-                print('mailvalited',mailvalidate.mail_valid)
                 otp.delete()
                 return redirect("Login")
             else:
                 messages.warning(request,"Entered OTP is Invalid")
     return render(request,"User/otp.html")
 
+
 def forget_password(request):
+    if request.method == "POST":
+        print(request.POST)
+        email = request.POST.get('email',None)
+        if email:
+            if User.objects.filter(email=email).exists():
+                send_mail(to_email=email)
+                messages.success(request,"Check your registered Mail for OTP")
+                return render(request,'User/otp.html',{'email':email})
+        otp = request.POST.get('otp',None)
+        if otp:
+            email = request.POST.get('otp_email')
+            user = User.objects.get(email=email)
+            otp = Code.objects.get(user=user)
+            if otp.code==str(otp):
+                otp.delete()
+                messages.success(request,"OTP Veified Reset Password")
+                return redirect("Reset_Password",email)
+            messages.warning(request,"Invalid OTP")
     return render(request,'User/forgetPassword.html')
 
+
+def reset_password(request,mail):
+    if request.method=="POST":
+        password = request.POST.get("password")
+        password2 = request.POST.get("confirm-password")
+        if password == password2:
+            try:
+                user = User.objects.get(username=mail)
+                user.password = password
+                user.save()
+                messages.success(request,"Password Updated Successfully")
+                return redirect("Login")
+            except:
+                messages.warning(request,"Something Went Wrong")
+                return render(request,"User/reset_password.html")
+        messages.warning(request,"Password Do not match")
+    return render(request,"User/reset_password.html")
+    
 
 def logout(request):
     auth.logout(request)

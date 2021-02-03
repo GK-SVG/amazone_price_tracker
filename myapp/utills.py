@@ -31,13 +31,9 @@ def send_mail(from_email="gkdevtest777@gmail.com",subject="Mail Verification",to
     server.ehlo()
     server.starttls()
     server.login(username,password)
-    try:
-        server.sendmail(from_email,to_email,msg_str)
-        server.quit()
-        return True
-    except:
-        server.quit()
-        return False
+    server.sendmail(from_email,to_email,msg_str)
+    server.quit()
+       
     
     
        
