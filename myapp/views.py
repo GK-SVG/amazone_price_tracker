@@ -1,14 +1,14 @@
 from django.shortcuts import render,HttpResponse,redirect
-from .forms import UserForm
+from .forms import UserForm,LinkForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from .utills import send_mail
 from django.contrib.auth.models import User
-from .models import Code,MailValid
+from .models import Code,MailValid,Links
 from django.contrib import messages
 # Create your views here.
 
-@login_required(login_url="Login")
+# @login_required(login_url="Login")
 def index(request):
     return render(request,"base.html")
 
@@ -117,4 +117,23 @@ def reset_password(request,mail):
 def logout(request):
     auth.logout(request)
     messages.success(request,"User Logout Successfully")
-    return redirect("Login")
+    return redirect("Index")
+
+
+@login_required(login_url="Login")
+def mylink(request):
+    user = request.user
+    if request.method=="POST":
+        form = LinkForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            title = form.cleaned_data['title']
+            url = form.cleaned_data['url']
+            tags = form.cleaned_data['tags']
+            public = form.cleaned_data['public']
+            tags = tags.split("#")
+            Links(user=user,title=title,url=url,tags=tags,public=public).save()
+            messages.success(request,"Link Saved Successfully")
+            return redirect("MyLink")
+    form = LinkForm()
+    return render(request,"myapp/mylink.html",{'form':form})

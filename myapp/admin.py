@@ -5,3 +5,4 @@ from .models import *
 
 admin.site.register(Code)
 admin.site.register(MailValid)
+admin.site.register(Links)
