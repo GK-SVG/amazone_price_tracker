@@ -23,13 +23,11 @@ class LinkForm(forms.ModelForm):
 
     class Meta:
         model = Links
-        fields = ["title","url","tags","public"]
+        fields = ["title","url"]
 
         widgets = {
             'title':forms.TextInput(attrs={'class':"form-control my-2 w-100 col-sm-11 col-md-11 col-12",'placeholder': 'Enter Title here'}),
             'url':forms.URLInput(attrs={'class':"form-control my-2 w-100 col-sm-11 col-md-11 col-12",'placeholder': 'Enter valid URL'}),
-            'tags':forms.TextInput(attrs={'class':"form-control my-2 w-100 col-sm-11 col-md-11 col-12",'placeholder': 'Enter tags with Start of #'}),
-            'public':forms.CheckboxInput(attrs={'class':"mt-3 myCheckbox col-sm-1 col-md-1 col-12",'checked':'checked'})
         }
         required = ("title","url","tags","public")
                     

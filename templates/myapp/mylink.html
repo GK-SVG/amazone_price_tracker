@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-.myCheckbox{
-    width:2rem;
-    height:2rem;
-}
-.scroll {
-    max-height: 100px;
-    overflow-y: auto;
-}
+    .myCheckbox {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .scroll {
+        max-height: 100px;
+        overflow-y: auto;
+    }
 </style>
 <div class="row mt-5">
     <div class="col-lg-6 my-1">
@@ -27,12 +28,13 @@
                             {% csrf_token %}
                             {% for field in form %}
                             <div class="col-lg-12 col-md-12 col-12 mt-2 row">
-                                <label class="control-label col-sm-1 col-md-1 col-12 mt-2" style="color:black;"><b>{{field.label}}</b></label>
+                                <label class="control-label col-sm-1 col-md-1 col-12 mt-2"
+                                    style="color:black;"><b>{{field.label}}</b></label>
                                 {{field}}
                             </div>
                             {% endfor %}
                             <div class="col-lg-12 col-md-12 mt-2 col-12 d-flex justify-content-center">
-                                <button type="submit" class="btn btn-info">Save Link</button>
+                                <input type="submit" class="btn btn-info" value="Save" />
                             </div>
                         </form>
                     </div>
@@ -40,28 +42,52 @@
             </div>
         </div>
     </div>
-    
-    
-    {% for link in request.user.Link.all %}
-    <div class="col-lg-6 card my-1 h-100" style="overflow-y: auto;">
+
+    <div class="col-lg-6 card my-1 h-100" style="overflow-y: auto; height:30rem;" id="My_Links">
+        {% for link in request.user.Link.all %}
         <div class="card my-2">
             <div class="card-header border-bottom border-default">
                 <div class="row">
-                    <div class="col-xl-10 col-md-10 col-sm-10 col-12">
+                    <div class="col-xl-12 col-md-12 col-sm-12 col-12">
                         <b style="color:black;">{{link.title}}</b>
-                    </div>
-                    <div class="col-xl-2 col-md-2 col-sm-2 col-12 d-flex justify-content-end">
-                        <button type="submit" class="btn btn-danger">Delete</button>
                     </div>
                 </div>
             </div>
             <div class="card-body ">
                 <a href="{{link.url}}">{{link.url}}</a>
+                <hr>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+    
+    $("#myform").submit(function (e) {
+        e.preventDefault();
+        var serializedData = $(this).serialize();
+        console.log('serializedData--',serializedData)
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'Post_Link' %}",
+            data: serializedData,
+            success: function (response) {
+                $("#myform").trigger('reset');
+                var instance = JSON.parse(response["instance"]);
+                var fields = instance[0]["fields"];
+                console.log(fields)
+                swal({
+                    text: "Link Added Successfully",
+                    icon: "success",
+                    button: "OK",
+                });  
+            },
+            error: function (response) {
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+    })
+</script>
 {% endblock content %}
-    
-    

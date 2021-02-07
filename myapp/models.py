@@ -28,8 +28,6 @@ class Links(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="Link")
     title = models.CharField(max_length=300)
     url = models.URLField(max_length=500)
-    tags = models.CharField(max_length=200)
-    public = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -6,6 +6,8 @@ from .utills import send_mail
 from django.contrib.auth.models import User
 from .models import Code,MailValid,Links
 from django.contrib import messages
+from django.http import JsonResponse
+from django.core import serializers
 # Create your views here.
 
 # @login_required(login_url="Login")
@@ -122,8 +124,15 @@ def logout(request):
 
 @login_required(login_url="Login")
 def mylink(request):
+    user = request.user           
+    form = LinkForm()
+    return render(request,"myapp/mylink.html",{'form':form})
+
+
+@login_required(login_url="Login")
+def post_link(request):
     user = request.user
-    if request.method=="POST":
+    if request.is_ajax and request.method=="POST":
         form = LinkForm(request.POST)
         if form.is_valid():
             print(form.cleaned_data)
@@ -132,8 +141,14 @@ def mylink(request):
             tags = form.cleaned_data['tags']
             public = form.cleaned_data['public']
             tags = tags.split("#")
-            Links(user=user,title=title,url=url,tags=tags,public=public).save()
+            print('tags--',tags)
+            instance = Links(user=user,title=title,url=url,tags=tags,public=public)
+            instance.save()
+            print('instance--',instance)
             messages.success(request,"Link Saved Successfully")
-            return redirect("MyLink")
-    form = LinkForm()
-    return render(request,"myapp/mylink.html",{'form':form})
+            ser_instance = serializers.serialize('json', [ instance, ])
+            print('ser_instance--',ser_instance)
+            return JsonResponse({"instance": ser_instance}, status=200)
+        else:
+            return JsonResponse({"error": form.errors}, status=400)
+    return JsonResponse({"error": ""}, status=400)

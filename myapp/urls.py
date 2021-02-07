@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (index,login,signup,forget_password,
-                    verify_otp,logout,reset_password,mylink)
+                    verify_otp,logout,reset_password,mylink,post_link)
 
 urlpatterns = [
     path('',index,name="Index"),
@@ -10,5 +10,6 @@ urlpatterns = [
     path('verify_otp/<str:mail>/',verify_otp,name="Otp"),
     path('forget_password/',forget_password,name="Forget_Password"),
     path('reset_password/<str:mail>/',reset_password,name="Reset_Password"),
-    path('mylink/',mylink,name="MyLink")
+    path('mylink/',mylink,name="MyLink"),
+    path('post_link/',post_link,name="Post_Link")
 ]
