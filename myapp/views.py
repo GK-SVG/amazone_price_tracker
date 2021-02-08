@@ -10,10 +10,6 @@ from django.http import JsonResponse
 from django.core import serializers
 # Create your views here.
 
-# @login_required(login_url="Login")
-def index(request):
-    return render(request,"base.html")
-
 
 def login(request):
     if request.method == "POST":
@@ -24,9 +20,9 @@ def login(request):
             user = User.objects.get(username=username,password=password)
             auth.login(request,user)
             messages.success(request,"User Logged In Successfully")
-            return redirect('Index')
+            return redirect('MyLink')
         except:
-            messages.warning(request,"Invalid Username or Passwrd")
+            messages.warning(request,"Invalid Username or Password")
     form = UserForm()
     return render(request,'User/Login.html',{'form':form})
 
@@ -138,17 +134,24 @@ def post_link(request):
             print(form.cleaned_data)
             title = form.cleaned_data['title']
             url = form.cleaned_data['url']
-            tags = form.cleaned_data['tags']
-            public = form.cleaned_data['public']
-            tags = tags.split("#")
-            print('tags--',tags)
-            instance = Links(user=user,title=title,url=url,tags=tags,public=public)
+            instance = Links(user=user,title=title,url=url)
             instance.save()
             print('instance--',instance)
-            messages.success(request,"Link Saved Successfully")
             ser_instance = serializers.serialize('json', [ instance, ])
             print('ser_instance--',ser_instance)
             return JsonResponse({"instance": ser_instance}, status=200)
         else:
             return JsonResponse({"error": form.errors}, status=400)
     return JsonResponse({"error": ""}, status=400)
+
+
+@login_required(login_url="Login")
+def delete_link(request,id):
+    user = request.user
+    if Links.objects.filter(user=user,id=id).exists():
+        del_link = Links.objects.get(user=user,id=id)
+        del_link.delete()
+        messages.success(request,"Link Deleted Successfully")
+        return redirect('MyLink')
+    messages.error(request,"Action not Allowed")
+    return redirect('MyLink')

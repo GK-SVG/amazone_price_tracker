@@ -29,6 +29,6 @@ class LinkForm(forms.ModelForm):
             'title':forms.TextInput(attrs={'class':"form-control my-2 w-100 col-sm-11 col-md-11 col-12",'placeholder': 'Enter Title here'}),
             'url':forms.URLInput(attrs={'class':"form-control my-2 w-100 col-sm-11 col-md-11 col-12",'placeholder': 'Enter valid URL'}),
         }
-        required = ("title","url","tags","public")
+        required = ("title","url")
                     
        

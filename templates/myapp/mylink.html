@@ -43,8 +43,8 @@
         </div>
     </div>
 
-    <div class="col-lg-6 card my-1 h-100" style="overflow-y: auto; height:30rem;" id="My_Links">
-        {% for link in request.user.Link.all %}
+    <div class="col-lg-6 card my-1 h-100" style="overflow-y: auto; max-height:30rem;" id="My_Links">
+        {% for link in request.user.Link.all reversed %}
         <div class="card my-2">
             <div class="card-header border-bottom border-default">
                 <div class="row">
@@ -56,6 +56,8 @@
             <div class="card-body ">
                 <a href="{{link.url}}">{{link.url}}</a>
                 <hr>
+                {{link.created_date}}
+                <a class="btn btn-danger" href="{% url 'Delete_Link' link.id %}">Delete</a>
             </div>
         </div>
         {% endfor %}
@@ -83,6 +85,23 @@
                     icon: "success",
                     button: "OK",
                 });  
+                $("#My_Links").prepend(
+                  ` <div class="card my-2">
+                        <div class="card-header border-bottom border-default">
+                            <div class="row">
+                                <div class="col-xl-12 col-md-12 col-sm-12 col-12">
+                                    <b style="color:black;">${fields['title']}</b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body ">
+                            <a href="${fields['url']}">${fields['url']}</a>
+                            <hr>
+                            ${fields['created_date']}
+                            
+                        </div>
+                    </div>`   
+                )
             },
             error: function (response) {
                 alert(response["responseJSON"]["error"]);
