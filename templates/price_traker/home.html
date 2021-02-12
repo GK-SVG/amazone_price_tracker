@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container d-flex justify-content-center">
+    <div class="col-lg-8 my-1">
+        <div class="card m-0">
+            <div class="card-header border-bottom border-default">
+                <div class="row">
+                    <div class="col-xl-12 col-md-12 col-sm-12 col-12">
+                        <h4 style="color:black;"><b>Add Your Product</b></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body ">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 cms-search">
+                        <form class="form-inline mt-2 mb-5" method="POST" action="{% url 'Post_product' %}">
+                            {% csrf_token %}
+                            
+                            <div class="col-lg-12 col-md-12 col-12 mt-2 row">
+                                <label class="control-label col-sm-1 col-md-1 col-12 mt-2"
+                                    style="color:black;"><b>PRICE</b></label>
+                                <input type="number" name="price" class="form-control my-2 w-100 col-sm-11 col-md-11 col-12" placeholder="Enter Desired Price" required>
+                            </div>
+                            
+                            <div class="col-lg-12 col-md-12 col-12 mt-2 row">
+                                <label class="control-label col-sm-1 col-md-1 col-12 mt-2"
+                                    style="color:black;"><b>URL</b></label>
+                                <input type="url" name="url" class="form-control my-2 w-100 col-sm-11 col-md-11 col-12" placeholder="Enter valid URL" maxlength="500" required>
+                            </div>
+                            
+                            <div class="col-lg-12 col-md-12 mt-2 col-12 d-flex justify-content-center">
+                                <input type="submit" class="btn btn-info" value="Save" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

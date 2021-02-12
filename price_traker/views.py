@@ -1,19 +1,46 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect,HttpResponse
 import requests
 from bs4 import BeautifulSoup
+from django.contrib.auth.decorators import login_required
+from .models import Price_Tracker_Model
+from django.contrib import messages
+
+
 # Create your views here.
-
-def price_tracker_home():
-    url = "https://www.amazon.in/Realme-Buds-Android-Smartphones-Black/dp/B07XMFDHSG/ref=sr_1_1?dchild=1&keywords=realme&qid=1612885307&s=electronics&sr=1-1"
-    response = requests.get(url)
-    data = response.text
-    # print("---------------------------data-------------------------------")
-    # print(data)
-    soup = BeautifulSoup(data, features='html.parser')
-    print("---------------------------Soup-------------------------------")
-    # print(soup)
-    img_div = soup.find("div", {"id": "imgTagWrapperId"})
-    print(img_div)
+header = {
+            "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
+            "Accept-Language":'en'
+         }
 
 
-price_tracker_home()
+@login_required(login_url="Login")
+def post_product(request):
+    if request.method=="POST":
+        print('request--',request)
+        print(request.POST)
+        product_url = request.POST.get("url","")
+        my_desired_price = request.POST.get("price","")
+        response = requests.get(product_url,headers=header)
+        data = response.text
+        soup = BeautifulSoup(data, features='html.parser')
+        print("--------title-------")
+        title = soup.find("h1",{"id": "title"}).text.strip("\n")
+        print(title)
+        print("--------img-------")
+        img_url   = soup.find("img",{"class": "a-dynamic-image"}).get("data-old-hires")
+        print(img_url)
+        print("--------price-------")
+        price = float(soup.find("span",{"id": "priceblock_ourprice"}).text[2:].replace(",",''))
+        print(price)
+        product = Price_Tracker_Model(amazone_product_url=product_url,amazone_product_title=title,amazone_product_price=price,my_price=float(my_desired_price),product_img=img_url)
+        product.save()
+        messages.success(request,"Product Addded Successfully")
+        return redirect("Price_Tracker_Home")
+
+    
+
+
+@login_required(login_url="Login")
+def price_tracker_home(request):
+    my_products = Price_Tracker_Model.objects.filter(user=request.user)
+    return render(request,"price_traker/home.html",{"my_products":my_products})

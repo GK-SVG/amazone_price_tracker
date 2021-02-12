@@ -131,14 +131,11 @@ def post_link(request):
     if request.is_ajax and request.method=="POST":
         form = LinkForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             title = form.cleaned_data['title']
             url = form.cleaned_data['url']
             instance = Links(user=user,title=title,url=url)
             instance.save()
-            print('instance--',instance)
             ser_instance = serializers.serialize('json', [ instance, ])
-            print('ser_instance--',ser_instance)
             return JsonResponse({"instance": ser_instance}, status=200)
         else:
             return JsonResponse({"error": form.errors}, status=400)
