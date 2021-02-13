@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'myapp',
-    'price_traker'
+    'price_traker',
+    'mathfilters'
 ]
 
 MIDDLEWARE = [

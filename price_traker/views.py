@@ -16,30 +16,21 @@ header = {
 @login_required(login_url="Login")
 def post_product(request):
     if request.method=="POST":
-        print('request--',request)
-        print(request.POST)
         product_url = request.POST.get("url","")
         my_desired_price = request.POST.get("price","")
         response = requests.get(product_url,headers=header)
         data = response.text
         soup = BeautifulSoup(data, features='html.parser')
-        print("--------title-------")
         title = soup.find("h1",{"id": "title"}).text.strip("\n")
-        print(title)
-        print("--------img-------")
         img_url   = soup.find("img",{"class": "a-dynamic-image"}).get("data-old-hires")
-        print(img_url)
-        print("--------price-------")
         price = float(soup.find("span",{"id": "priceblock_ourprice"}).text[2:].replace(",",''))
-        print(price)
-        product = Price_Tracker_Model(amazone_product_url=product_url,amazone_product_title=title,amazone_product_price=price,my_price=float(my_desired_price),product_img=img_url)
+        product = Price_Tracker_Model(user=request.user,amazone_product_url=product_url,amazone_product_title=title,amazone_product_price=price,my_price=float(my_desired_price),product_img=img_url)
         product.save()
         messages.success(request,"Product Addded Successfully")
         return redirect("Price_Tracker_Home")
 
     
-
-
+    
 @login_required(login_url="Login")
 def price_tracker_home(request):
     my_products = Price_Tracker_Model.objects.filter(user=request.user)
