@@ -1,8 +1,16 @@
+# This Project has 2 app.
+# 1--->MyLinks
+# 2--->Amazone Price Tracker
+
 # MYlinks
 <p>
 This project based on users and links here you can easily create your account and add your important links.
-You can make your links PUBLIC OR PRIVATE.
+You can make your links PUBLIC OR PRIVATE, so other can view links in home page.
 </p>
+
+# Amazone Price Tracker
+<p>Here you can add links of amazone products links and add your desired price when price is less than
+your or equil to your desired price it will send you notification on your registered gmail with amazone product link</p>
 
 ## Want To Learn Django
 **Here Are Some Important Channels on Youtube(Search channel name on Youtube)**
@@ -51,3 +59,5 @@ $ python manage.py runserver
 ## Contributing
 
 I love contributions, so please feel free to fix bugs, improve things, provide documentation. Just send a pull request.
+
+

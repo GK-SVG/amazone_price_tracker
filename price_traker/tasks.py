@@ -1,5 +1,5 @@
 from celery import shared_task 
-from .models import Price_Tracker_Model
+from price_traker.models import Price_Tracker_Model
 import requests
 from bs4 import BeautifulSoup
 
@@ -22,3 +22,5 @@ def update_product_price():
         product.amazone_product_price = price
         print('price---',price)
         product.save()
+
+
